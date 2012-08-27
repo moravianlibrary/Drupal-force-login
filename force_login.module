@@ -1,0 +1,77 @@
+<?php
+
+function force_login_config($key) {
+  $default_values = array(
+    'force_login_mode' => 'whitelist',
+    'force_login_ip_addresses' => 'blaclist',
+  );
+  return variable_get($key, $default_values[$key]);
+}
+
+function force_login_init() {
+  global $user;
+  $ips = explode(',', force_login_config('force_login_ip_addresses'));
+  $mode = force_login_config('force_login_mode');
+  $ip = $_SERVER['REMOTE_ADDR'];
+  $force_login = in_array($ip, $ips);
+  if ($mode == 'whitelist') {
+    $force_login = !$force_login;
+  }
+  if ($force_login && !$user->uid && !(arg(0) == "user" && arg(1) == "login")) {
+     $destination = drupal_get_destination();
+     drupal_goto('user/login', $destination);
+  }
+}
+
+function force_login_perm() {
+  return array('administer force login');
+}
+
+function force_login_admin() {
+  $form = array();
+
+  $form['force_login_settings'] = array(
+    '#type'        => 'fieldset',
+    '#title'       => t('Force login settings'),
+    '#weight'      => -10,
+    '#collapsible' => FALSE,
+  );
+
+  $form['force_login_settings']['force_login_mode'] = array(
+    '#type'          => 'select',
+    '#title'         => t('Mode of operation'),
+    '#default_value' => force_login_config('force_login_mode'),
+    '#options' => array(
+       "whitelist" => "whitelist",
+       "blacklist" => "blacklist"
+    ),
+    '#description'   => t('Mode of operation. Blacklist - users accessing web from listed ip addresses are forced to login. Whitelist - users accessing web from listed ip addresses are not forced to login.'),
+  );
+
+  $form['force_login_settings']['force_login_ip_addresses'] = array(
+    '#type'          => 'textfield',
+    '#title'         => t('List of IP addresses'),
+    '#default_value' => force_login_config('force_login_ip_addresses'),
+    '#description'   => t('List of IP addresses separatedy by comma (,).'),
+  );
+
+  return system_settings_form($form);
+}
+
+function force_login_menu() {
+
+  $items = array();
+
+  $items['admin/settings/force_login'] = array(
+    'title' => 'Force login settings',
+    'description' => 'Force login settings',
+    'page callback' => 'drupal_get_form',
+    'page arguments' => array('force_login_admin'),
+    'access arguments' => array('administer force login'),
+    'type' => MENU_NORMAL_ITEM,
+   );
+
+  return $items;
+}
+
+?>

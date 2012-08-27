@@ -1,0 +1,5 @@
+; $Id: force_login.info,v 1.6 2012/08/27 11:25:46 xrosecky Exp $
+name = "Force login based on IP address"
+description = "Force login based on IP address"
+core = "6.x"
+package = "Custom"

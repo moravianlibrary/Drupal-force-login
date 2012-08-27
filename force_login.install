@@ -1,0 +1,9 @@
+<?php
+
+function force_login_install() {
+  db_query('Update {system} SET weight=100 WHERE name="force_login"');
+  variable_set("force_login_mode", "whitelist");
+  variable_set("force_login_ip_addresses", "");
+}
+
+?>
