@@ -52,7 +52,7 @@ function force_login_admin() {
     '#type'          => 'textfield',
     '#title'         => t('List of IP addresses'),
     '#default_value' => force_login_config('force_login_ip_addresses'),
-    '#description'   => t('List of IP addresses separatedy by comma (,).'),
+    '#description'   => t('List of IP addresses separated by comma (,).'),
   );
 
   return system_settings_form($form);
